@@ -18,6 +18,7 @@ patch-backup-*/
 **/patch-backup-*/
 .angular/
 .vs/
+docs/
 
 # Local patch backups and reports
 patch-backup-*/
