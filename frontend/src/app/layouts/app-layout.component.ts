@@ -118,7 +118,11 @@ export class AppLayoutComponent implements OnInit {
       : this.nav();
   });
 
-  readonly primaryNav = computed(() => this.nav().slice(0, 6));
+  readonly primaryNav = computed(() => {
+    const role = this.user()?.role;
+    const limit = role === 'Student' ? 7 : (role === 'Lecturer' ? 6 : 7);
+    return this.nav().slice(0, limit);
+  });
   readonly homeRoute = computed(() => this.auth.homeFor(this.user()?.role ?? 'Student'));
 
   ngOnInit(): void {

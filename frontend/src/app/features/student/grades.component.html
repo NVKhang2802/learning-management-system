@@ -1,13 +1,22 @@
 <app-page-header
   title="Kết quả học tập"
   subtitle="Bảng điểm toàn khóa theo học kỳ và chương trình đào tạo.">
-  <button
-    class="primary-button"
-    type="button"
-    (click)="exportTranscript()">
-    <span class="material-symbols-outlined">download</span>
-    Xuất Excel
-  </button>
+  <div style="display: flex; gap: 8px; align-items: center;">
+    <button
+      class="secondary-button"
+      type="button"
+      (click)="printTranscript()">
+      <span class="material-symbols-outlined">print</span>
+      In bảng điểm
+    </button>
+    <button
+      class="primary-button"
+      type="button"
+      (click)="exportTranscript()">
+      <span class="material-symbols-outlined">download</span>
+      Xuất Excel
+    </button>
+  </div>
 </app-page-header>
 
 @if (loading()) {
@@ -77,18 +86,31 @@
         <h2>Kết quả theo từng học kỳ</h2>
       </div>
 
-      <div class="transcript-legend">
-        <span>
-          <i class="legend-dot passed"></i>
-          Đạt
-        </span>
-        <span>
-          <i class="legend-dot failed"></i>
-          Không đạt
-        </span>
-        <span>
-          Nhấp biểu tượng cuối dòng để xem công thức
-        </span>
+      <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--muted);">Lọc học kỳ:</label>
+          <select [value]="selectedSemester()" (change)="selectedSemester.set($any($event.target).value)"
+                  style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; font-weight: 500; background: var(--card); color: var(--text);">
+            <option value="all">Tất cả các học kỳ ({{ terms().length }} kỳ)</option>
+            @for (t of terms(); track t.academicYear + t.semesterCode) {
+              <option [value]="t.academicYear + '-' + t.semesterCode">{{ t.semesterName }} ({{ t.academicYear }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="transcript-legend">
+          <span>
+            <i class="legend-dot passed"></i>
+            Đạt
+          </span>
+          <span>
+            <i class="legend-dot failed"></i>
+            Không đạt
+          </span>
+          <span>
+            Nhấp biểu tượng cuối dòng để xem công thức
+          </span>
+        </div>
       </div>
     </div>
 
@@ -157,7 +179,7 @@
 
         <tbody>
           @for (
-            term of terms();
+            term of filteredTerms();
             track term.academicYear + term.semesterCode
           ) {
             <tr class="semester-title-row">

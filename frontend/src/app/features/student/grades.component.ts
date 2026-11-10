@@ -38,6 +38,12 @@ export class GradesComponent implements OnInit {
   private transcriptScroll?: ElementRef<HTMLDivElement>;
 
   readonly terms = signal<TranscriptTerm[]>([]);
+  readonly selectedSemester = signal<string>('all');
+  readonly filteredTerms = computed(() => {
+    const sel = this.selectedSemester();
+    if (sel === 'all') return this.terms();
+    return this.terms().filter(t => (t.academicYear + '-' + t.semesterCode) === sel || t.semesterName === sel);
+  });
   readonly curriculum = signal<StudentCurriculum | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -142,6 +148,14 @@ export class GradesComponent implements OnInit {
       }
     });
   }
+
+  printTranscript(): void {
+
+    window.print();
+
+  }
+
+
 
   exportTranscript(): void {
     this.api.getBlob('/student/transcript/export')

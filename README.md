@@ -8,16 +8,16 @@ EduManage LMS được xây dựng cho đề tài Cơ sở dữ liệu NoSQL, h�
 
 ## 1. Công nghệ sử dụng
 
-| Thành phần | Công nghệ |
-|---|---|
-| Frontend | Angular 20, TypeScript, SCSS |
-| Backend | ASP.NET Core 8 Web API |
-| Cơ sở dữ liệu | MongoDB 7 Replica Set |
-| Xác thực | JWT, BCrypt |
-| Realtime | SignalR |
-| Xuất dữ liệu | ClosedXML, QuestPDF |
-| Triển khai | Docker, Docker Compose |
-| Kiểm thử | xUnit, Angular Test |
+| Thành phần    | Công nghệ                    |
+| ------------- | ---------------------------- |
+| Frontend      | Angular 20, TypeScript, SCSS |
+| Backend       | ASP.NET Core 8 Web API       |
+| Cơ sở dữ liệu | MongoDB 7 Replica Set        |
+| Xác thực      | JWT, BCrypt                  |
+| Realtime      | SignalR                      |
+| Xuất dữ liệu  | ClosedXML, QuestPDF          |
+| Triển khai    | Docker, Docker Compose       |
+| Kiểm thử      | xUnit, Angular Test          |
 
 ---
 
@@ -114,7 +114,7 @@ Cần cài thêm:
 ## 5. Clone project
 
 ```powershell
-git clone https://github.com/huancode2203/nosql.git
+git clone https://github.com/NVKhang2802/learning-management-system.git
 cd nosql
 ```
 
@@ -198,12 +198,12 @@ docker compose logs mongo --tail 150
 
 ## 8. Địa chỉ truy cập
 
-| Dịch vụ | Địa chỉ |
-|---|---|
-| Website | http://localhost:8081 |
-| Swagger API | http://localhost:8080/swagger |
-| API Health Check | http://localhost:8080/health |
-| MongoDB | mongodb://localhost:27017 |
+| Dịch vụ          | Địa chỉ                       |
+| ---------------- | ----------------------------- |
+| Website          | http://localhost:8081         |
+| Swagger API      | http://localhost:8080/swagger |
+| API Health Check | http://localhost:8080/health  |
+| MongoDB          | mongodb://localhost:27017     |
 
 Sau khi build lại frontend, nên nhấn:
 
@@ -217,11 +217,11 @@ Ctrl + F5
 
 ## 9. Tài khoản demo
 
-| Vai trò | Email | Mật khẩu |
-|---|---|---|
-| Quản trị viên | `admin@lms.edu.vn` | `Lms@123456` |
-| Giảng viên | `gv001@lms.edu.vn` | `Lms@123456` |
-| Sinh viên | `sv001@lms.edu.vn` | `Lms@123456` |
+| Vai trò       | Email                                | Mật khẩu     |
+| ------------- | ------------------------------------ | ------------ |
+| Quản trị viên | `admin@lms.edu.vn`                   | `Lms@123456` |
+| Giảng viên    | `gv001@lms.edu.vn`                   | `Lms@123456` |
+| Sinh viên     | `2001230381` hoặc `sv001@lms.edu.vn` | `Lms@123456` |
 
 Các tài khoản này chỉ dùng cho môi trường development và dữ liệu seed.
 
@@ -558,12 +558,17 @@ postman/
 
 ## Tác giả
 
-**Phạm Đăng Huấn**
+- **Nguyễn Vĩnh Khang** - MSSV: `2001230381` (Trưởng nhóm)
+- **Nguyễn Quốc Việt** - MSSV: `2001231038`
+- **Phùng Chí Trung** - MSSV: `2001230999`
+
+**Môn học:** Cơ sở dữ liệu NoSQL
+**Đề tài:** Hệ thống Quản lý và Chấm điểm Học tập Trực tuyến (EduManage LMS)
 
 Repository:
 
 ```text
-https://github.com/huancode2203/nosql
+https://github.com/NVKhang2802/learning-management-system
 ```
 
 ---

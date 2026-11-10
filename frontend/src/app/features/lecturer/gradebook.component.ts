@@ -1,4 +1,4 @@
-import { Component, OnInit, input, signal } from '@angular/core';
+import { Component, OnInit, input, signal, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -60,6 +60,15 @@ export class GradebookComponent implements OnInit {
   importModal = signal(false);
   importPreview = signal<ImportPreview | null>(null);
   importFile: File | null = null;
+
+  readonly gradingProgress = computed(() => {
+    const book = this.book();
+    if (!book || !book.students?.length) return { filled: 0, total: 0, percent: 0 };
+    const total = book.students.length;
+    const filled = (book.students as any[]).filter(s => s.finalScore !== null && s.finalScore !== undefined).length;
+    const percent = Math.round((filled / total) * 100);
+    return { filled, total, percent };
+  });
 
   constructor(
     private api: ApiService,

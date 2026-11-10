@@ -1,32 +1,56 @@
 const dbName = process.env.MONGO_INITDB_DATABASE || 'EduManageLms';
 const lms = db.getSiblingDB(dbName);
-lms.users.createIndex({ username: 1 }, { unique: true, name: 'ux_users_username' });
-lms.users.createIndex({ email: 1 }, { unique: true, name: 'ux_users_email' });
+
+const notDeleted = { isDeleted: false };
+
+// Users
+lms.users.createIndex({ username: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_users_username' });
+lms.users.createIndex({ email: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_users_email' });
+lms.users.createIndex({ studentCode: 1 }, { unique: true, partialFilterExpression: { isDeleted: false, studentCode: { $type: 'string', $gt: '' } }, name: 'ux_users_studentCode' });
+lms.users.createIndex({ lecturerCode: 1 }, { unique: true, partialFilterExpression: { isDeleted: false, lecturerCode: { $type: 'string', $gt: '' } }, name: 'ux_users_lecturerCode' });
 lms.users.createIndex({ role: 1, status: 1 }, { name: 'ix_users_role_status' });
-lms.students.createIndex({ studentCode: 1 }, { unique: true, name: 'ux_students_studentCode' });
+
+// Students
+lms.students.createIndex({ studentCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_students_studentCode' });
 lms.students.createIndex({ 'academicRecords.academicYearId': 1, 'academicRecords.semesters.semesterId': 1 }, { name: 'ix_students_year_semester' });
-lms.lecturers.createIndex({ lecturerCode: 1 }, { unique: true, name: 'ux_lecturers_lecturerCode' });
-lms.courses.createIndex({ courseCode: 1 }, { unique: true, name: 'ux_courses_courseCode' });
-lms.classSections.createIndex({ classSectionCode: 1 }, { unique: true, name: 'ux_sections_code' });
+
+// Lecturers
+lms.lecturers.createIndex({ lecturerCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_lecturers_lecturerCode' });
+
+// Courses
+lms.courses.createIndex({ courseCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_courses_courseCode' });
+
+// Class Sections
+lms.classSections.createIndex({ classSectionCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_sections_code' });
 lms.classSections.createIndex({ academicYearId: 1, semesterId: 1, lecturerId: 1 }, { name: 'ix_sections_year_semester_lecturer' });
 lms.classSections.createIndex({ 'students.studentCode': 1 }, { name: 'ix_sections_studentCode' });
+
+// Notifications & Audit Logs
 lms.notifications.createIndex({ recipientIds: 1 }, { name: 'ix_notifications_recipients' });
 lms.notifications.createIndex({ createdAt: -1 }, { name: 'ix_notifications_createdAt' });
 lms.auditLogs.createIndex({ createdAt: -1 }, { name: 'ix_audit_createdAt' });
-lms.faculties.createIndex({ facultyCode: 1 }, { unique: true, name: 'ux_faculties_facultyCode' });
-lms.programs.createIndex({ programCode: 1 }, { unique: true, name: 'ux_programs_programCode' });
-lms.academicYears.createIndex({ academicYearCode: 1 }, { unique: true, name: 'ux_academicYears_code' });
-lms.academicYears.createIndex({ isCurrent: 1 }, { name: 'ix_academicYears_current' });
-lms.semesters.createIndex({ academicYearId: 1, semesterCode: 1 }, { unique: true, name: 'ux_semesters_year_code' });
+
+// Organizational Entities
+lms.faculties.createIndex({ facultyCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_faculties_facultyCode' });
+lms.programs.createIndex({ programCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_programs_programCode' });
+lms.academicYears.createIndex({ academicYearCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_academicYears_code' });
+lms.academicYears.createIndex({ isCurrent: 1 }, { unique: true, partialFilterExpression: { isDeleted: false, isCurrent: true }, name: 'ux_academicYears_single_current' });
+lms.semesters.createIndex({ academicYearId: 1, semesterCode: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_semesters_year_code' });
 lms.semesters.createIndex({ gradeEntryStart: 1, gradeEntryEnd: 1 }, { name: 'ix_semesters_gradeWindow' });
+
+// Learning Materials & Assignments
 lms.materials.createIndex({ classSectionId: 1, createdAt: -1 }, { name: 'ix_materials_section_createdAt' });
 lms.materials.createIndex({ lecturerCode: 1 }, { name: 'ix_materials_lecturerCode' });
 lms.assignments.createIndex({ classSectionId: 1, dueAt: 1 }, { name: 'ix_assignments_section_dueAt' });
 lms.assignments.createIndex({ lecturerCode: 1 }, { name: 'ix_assignments_lecturerCode' });
-lms.submissions.createIndex({ assignmentId: 1, studentId: 1 }, { unique: true, name: 'ux_submissions_assignment_student' });
+lms.submissions.createIndex({ assignmentId: 1, studentId: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_submissions_assignment_student' });
 lms.submissions.createIndex({ classSectionId: 1, status: 1 }, { name: 'ix_submissions_section_status' });
+
+// Schedules, Settings & Tokens
 lms.examSchedules.createIndex({ classSectionId: 1, startAt: 1 }, { name: 'ix_examSchedules_section_startAt' });
-lms.systemSettings.createIndex({ key: 1 }, { unique: true, name: 'ux_systemSettings_key' });
+lms.systemSettings.createIndex({ key: 1 }, { unique: true, partialFilterExpression: notDeleted, name: 'ux_systemSettings_key' });
 lms.gradeReopenRequests.createIndex({ status: 1, createdAt: -1 }, { name: 'ix_gradeReopen_status_createdAt' });
-lms.passwordResetTokens.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: 'ttl_password_reset' });
+lms.passwordResetTokens.createIndex({ userId: 1, usedAt: 1 }, { name: 'ix_passwordReset_user_active' });
+lms.passwordResetTokens.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: 'ttl_passwordReset_expiresAt' });
+
 print('MongoDB indexes created for ' + dbName);

@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-lms_admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-LmsMongo@123}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-LmsMongo2026}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-EduManageLms}
       MONGO_REPLICA_KEY: ${MONGO_REPLICA_KEY:-EduManageLmsReplicaKeyChangeInProduction2026}
     entrypoint: ["/bin/bash", "-c"]
@@ -43,13 +43,13 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
-      MongoDb__ConnectionString: mongodb://${MONGO_ROOT_USERNAME:-lms_admin}:${MONGO_ROOT_PASSWORD:-LmsMongo@123}@mongo:27017/?authSource=admin&replicaSet=rs0
+      MongoDb__ConnectionString: mongodb://${MONGO_ROOT_USERNAME:-lms_admin}:${MONGO_ROOT_PASSWORD:-LmsMongo2026}@mongo:27017/?authSource=admin&replicaSet=rs0
       MongoDb__DatabaseName: ${MONGO_DATABASE:-EduManageLms}
       Jwt__Key: ${JWT_KEY:-DEVELOPMENT_ONLY_CHANGE_TO_AT_LEAST_32_CHARACTERS}
       Jwt__Issuer: ${JWT_ISSUER:-EduManageLms}
       Jwt__Audience: ${JWT_AUDIENCE:-EduManageLms.Client}
       Backup__Directory: /app/backups
-    ports: ["8080:8080"]
+    ports: ["8082:8080"]
     volumes:
       - backup_data:/app/backups
       - upload_data:/app/uploads

@@ -438,10 +438,10 @@ public sealed class DataSeeder(MongoContext db, ILogger<DataSeeder> log)
             for (var i = 0; i < cohort.StudentCount; i++)
             {
                 var special = cohort.Cohort == "2023" && i == 0;
-                var studentCode = special ? "2001230282" : $"2001{cohort.Cohort[^2..]}{i + 1:0000}";
-                var fullName = special ? "Phạm Đăng Huấn" : BuildStudentName(globalIndex + 1);
+                var studentCode = special ? "2001230381" : $"2001{cohort.Cohort[^2..]}{i + 1:0000}";
+                var fullName = special ? "Nguyễn Vĩnh Khang" : BuildStudentName(globalIndex + 1);
                 var classCode = special
-                    ? "14DHTH14"
+                    ? "14DHTH13"
                     : cohort.Classes.ElementAt(Math.Min(cohort.Classes.Count - 1, i * cohort.Classes.Count / cohort.StudentCount));
                 var program = programs[cohort.Cohort];
                 students.Add(new Student

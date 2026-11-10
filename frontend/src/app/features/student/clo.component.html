@@ -1,1 +1,103 @@
-<app-page-header title="Mức độ đạt chuẩn đầu ra CLO" subtitle="Kết quả được tổng hợp từ các thành phần đánh giá bằng MongoDB Aggregation."></app-page-header><section class="clo-grid">@for(c of items();track c.courseCode+c.cloCode){<article class="panel clo-card"><div class="clo-heading"><div><span>{{c.courseCode}} · {{c.courseName}}</span><h3>{{c.cloCode}}</h3></div><span class="badge" [class.success]="c.passed" [class.danger]="!c.passed">{{c.passed?'Đạt':'Chưa đạt'}}</span></div><p>{{c.description}}</p><div class="progress-label"><span>Mức độ đạt</span><b>{{c.percentage}}%</b></div><div class="progress"><i [style.width.%]="c.percentage"></i><em [style.left.%]="c.threshold"></em></div><small>Ngưỡng đạt: {{c.threshold}}% · Thành phần: {{c.contributingComponents.join(', ')}}</small></article>}</section>
+<app-page-header
+  title="Mức độ đạt chuẩn đầu ra CLO"
+  subtitle="Kết quả được tổng hợp trực tiếp từ các thành phần đánh giá bằng MongoDB Aggregation Pipeline.">
+</app-page-header>
+
+<!-- Radar Chart Card -->
+<section class="panel" style="margin-bottom: 20px; padding: 22px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <span class="eyebrow" style="color: #0b6fc2; font-weight: 700; font-size: 11px; letter-spacing: 0.08em;">TRỰC QUAN HÓA NĂNG LỰC</span>
+      <h3 style="margin: 4px 0 0; font-size: 19px; color: #0b1c30;">Biểu đồ Mạng nhện Chuẩn đầu ra (CLO Radar Chart)</h3>
+      <p style="margin: 4px 0 0; color: var(--muted); font-size: 13px;">So sánh mức độ hoàn thành thực tế (vùng màu xanh) với ngưỡng đạt chuẩn 50% (đường viền đỏ).</p>
+    </div>
+
+    <div style="display: flex; gap: 16px; align-items: center; background: #f0f7ff; padding: 10px 18px; border-radius: 12px; border: 1px solid #c2e0fa;">
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 11px; color: var(--muted);">Tỷ lệ đạt chuẩn</span>
+        <strong style="font-size: 22px; color: #0b6fc2;">{{ overallRate() }}%</strong>
+      </div>
+      <div style="width: 1px; height: 32px; background: #c2e0fa;"></div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 11px; color: var(--muted);">Số chuẩn đã đạt</span>
+        <strong style="font-size: 22px; color: #0f9f6e;">{{ passedCount() }} / {{ totalCount() }}</strong>
+      </div>
+    </div>
+  </div>
+
+  @if (radarItems().length > 0) {
+    <div style="display: flex; justify-content: center; align-items: center; padding: 10px 0;">
+      <svg viewBox="0 0 400 360" style="max-width: 440px; width: 100%; height: auto; overflow: visible;">
+        <!-- Circular grid levels -->
+        <circle cx="200" cy="180" r="30" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3" />
+        <circle cx="200" cy="180" r="60" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3" />
+        <circle cx="200" cy="180" r="90" fill="none" stroke="#cbd5e1" stroke-width="1" />
+        <circle cx="200" cy="180" r="120" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+
+        <!-- Axes lines -->
+        @for (ax of radarAxes(); track ax.label) {
+          <line x1="200" y1="180" [attr.x2]="ax.x" [attr.y2]="ax.y" stroke="#cbd5e1" stroke-width="1" />
+          <text [attr.x]="ax.lx" [attr.y]="ax.ly" text-anchor="middle" dominant-baseline="central"
+                style="font-size: 10.5px; font-weight: 600; fill: #334155; font-family: Inter, sans-serif;">
+            {{ ax.label }}
+          </text>
+        }
+
+        <!-- 50% Threshold Polygon (Red outline) -->
+        <polygon [attr.points]="thresholdPolygon()"
+                 fill="rgba(239, 68, 68, 0.08)"
+                 stroke="#ef4444"
+                 stroke-width="1.5"
+                 stroke-dasharray="4,4" />
+
+        <!-- Student Actual CLO Polygon (Blue shaded) -->
+        <polygon [attr.points]="radarPolygon()"
+                 fill="rgba(11, 111, 194, 0.28)"
+                 stroke="#0b6fc2"
+                 stroke-width="2.5" />
+
+        <!-- Center origin dot -->
+        <circle cx="200" cy="180" r="4" fill="#0b6fc2" />
+      </svg>
+    </div>
+
+    <!-- Chart legend -->
+    <div style="display: flex; justify-content: center; gap: 24px; font-size: 12px; margin-top: 10px;">
+      <span style="display: flex; align-items: center; gap: 6px;">
+        <span style="display: inline-block; width: 14px; height: 14px; background: rgba(11, 111, 194, 0.4); border: 2px solid #0b6fc2; border-radius: 3px;"></span>
+        Năng lực sinh viên đạt được
+      </span>
+      <span style="display: flex; align-items: center; gap: 6px;">
+        <span style="display: inline-block; width: 14px; height: 3px; background: #ef4444; border-radius: 2px;"></span>
+        Ngưỡng tối thiểu chuẩn đầu ra (50%)
+      </span>
+    </div>
+  }
+</section>
+
+<!-- Detailed Grid Cards -->
+<section class="clo-grid">
+  @for (c of items(); track c.courseCode + c.cloCode) {
+    <article class="panel clo-card">
+      <div class="clo-heading">
+        <div>
+          <span>{{ c.courseCode }} · {{ c.courseName }}</span>
+          <h3>{{ c.cloCode }}</h3>
+        </div>
+        <span class="badge" [class.success]="c.passed" [class.danger]="!c.passed">
+          {{ c.passed ? 'Đạt chuẩn' : 'Chưa đạt' }}
+        </span>
+      </div>
+      <p>{{ c.description }}</p>
+      <div class="progress-label">
+        <span>Mức độ đạt được</span>
+        <b>{{ c.percentage }}%</b>
+      </div>
+      <div class="progress">
+        <i [style.width.%]="c.percentage"></i>
+        <em [style.left.%]="c.threshold"></em>
+      </div>
+      <small>Ngưỡng chuẩn: {{ c.threshold }}% · Thành phần đánh giá: {{ c.contributingComponents.join(', ') }}</small>
+    </article>
+  }
+</section>
