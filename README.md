@@ -198,12 +198,32 @@ docker compose logs mongo --tail 150
 
 ## 8. Địa chỉ truy cập
 
-| Dịch vụ          | Địa chỉ                       |
-| ---------------- | ----------------------------- |
-| Website          | http://localhost:8081         |
-| Swagger API      | http://localhost:8082/swagger |
-| API Health Check | http://localhost:8082/health  |
-| MongoDB          | mongodb://localhost:27018     |
+| Dịch vụ          | Địa chỉ                                            |
+| ---------------- | -------------------------------------------------- |
+| Website          | http://localhost:8081                              |
+| Swagger API      | http://localhost:8082/swagger                      |
+| API Health Check | http://localhost:8082/health                       |
+| MongoDB (Host)   | mongodb://localhost:27018/?directConnection=true   |
+
+### Hướng dẫn kết nối bằng MongoDB Compass
+
+Để tra cứu, kiểm tra dữ liệu và theo dõi biến động Collection trực tiếp trên giao diện GUI:
+
+1. Khởi động phần mềm **MongoDB Compass** trên máy tính.
+2. Tại ô **New Connection (URI)**, dán chuỗi kết nối:
+   ```text
+   mongodb://localhost:27018/?directConnection=true
+   ```
+   > 💡 **Lưu ý quan trọng**: Tham số `?directConnection=true` giúp Compass kết nối trực tiếp đến cổng host `27018` của MongoDB Replica Set chạy trong Docker mà không bị lỗi chuyển hướng tên miền container nội bộ (`mongo:27017`).
+
+3. Bấm **Connect**.
+4. Chọn cơ sở dữ liệu **`EduManageLms`**.
+5. Các Collection chính để tra cứu và kiểm chứng chức năng:
+   - `students`: Hồ sơ sinh viên, thông tin lớp, khoa và lịch sử điểm tích lũy (tra cứu nhanh: `{ "studentCode": "2001230381" }`).
+   - `classSections`: 236 lớp học phần, sĩ số, bảng điểm sinh viên (`gradeStatus`: Draft / Submitted / Published).
+   - `auditLogs`: Nhật ký vết kiểm toán mọi hành vi thay đổi điểm số (`GRADE_UPDATE`), công bố điểm (`GRADE_PUBLISH`).
+   - `courses`, `programs`, `faculties`: Danh mục môn học, 106 môn trong chương trình đào tạo và cơ cấu khoa.
+   - `users`, `systemSettings`: Danh sách tài khoản phân quyền và các tham số cấu hình học vụ toàn trường.
 
 Sau khi build lại frontend, nên nhấn:
 
