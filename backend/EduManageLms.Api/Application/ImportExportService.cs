@@ -42,7 +42,10 @@ public sealed class ImportExportService(
         }
         else
         {
-            var keys = documents.SelectMany(x => x.Names).Where(x => x is not "passwordHash" and not "refreshTokens").Distinct().ToList();
+            var keys = documents.SelectMany(x => x.Names)
+                .Where(x => x is not "passwordHash" and not "refreshTokens" and not "_t")
+                .Distinct()
+                .ToList();
             for (var i = 0; i < keys.Count; i++) sheet.Cell(1, i + 1).Value = keys[i] == "_id" ? "id" : keys[i];
             sheet.Row(1).Style.Font.SetBold();
             for (var row = 0; row < documents.Count; row++)
@@ -50,15 +53,80 @@ public sealed class ImportExportService(
                 for (var col = 0; col < keys.Count; col++)
                 {
                     var value = documents[row].GetValue(keys[col], BsonNull.Value);
-                    sheet.Cell(row + 2, col + 1).Value = value.IsBsonNull ? "" : value.IsString ? value.AsString : value.IsNumeric ? value.ToDouble() : value.IsBoolean ? value.AsBoolean : value.IsValidDateTime ? value.ToUniversalTime() : value.ToJson();
+                    SetExportCellValue(sheet.Cell(row + 2, col + 1), value);
                 }
             }
-            sheet.Columns().AdjustToContents();
+            try
+            {
+                sheet.Columns().AdjustToContents(1, 40);
+            }
+            catch
+            {
+                // Bỏ qua nếu có lỗi tính toán độ rộng cột tự động
+            }
             sheet.SheetView.FreezeRows(1);
         }
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
         return stream.ToArray();
+    }
+
+    private static void SetExportCellValue(IXLCell cell, BsonValue value)
+    {
+        if (value.IsBsonNull)
+        {
+            cell.Value = "";
+            return;
+        }
+
+        if (value.IsString)
+        {
+            var text = value.AsString;
+            cell.Value = text.Length > 32000 ? text[..32000] + "..." : text;
+            return;
+        }
+
+        if (value.IsNumeric)
+        {
+            cell.Value = value.ToDouble();
+            return;
+        }
+
+        if (value.IsBoolean)
+        {
+            cell.Value = value.AsBoolean;
+            return;
+        }
+
+        if (value.IsValidDateTime)
+        {
+            cell.Value = value.ToUniversalTime();
+            return;
+        }
+
+        if (value.IsBsonArray)
+        {
+            var arr = value.AsBsonArray;
+            if (arr.Count > 0 && arr[0].IsBsonDocument)
+            {
+                cell.Value = $"[{arr.Count} mục]";
+                return;
+            }
+
+            var json = arr.ToJson();
+            cell.Value = json.Length > 32000 ? json[..32000] + "..." : json;
+            return;
+        }
+
+        if (value.IsBsonDocument)
+        {
+            var json = value.ToJson();
+            cell.Value = json.Length > 32000 ? json[..32000] + "..." : json;
+            return;
+        }
+
+        var fallback = value.ToString() ?? "";
+        cell.Value = fallback.Length > 32000 ? fallback[..32000] + "..." : fallback;
     }
 
     public async Task<ImportPreviewDto> ImportStudentsAsync(IFormFile file, bool commit, CancellationToken ct)

@@ -201,9 +201,9 @@ docker compose logs mongo --tail 150
 | Dịch vụ          | Địa chỉ                       |
 | ---------------- | ----------------------------- |
 | Website          | http://localhost:8081         |
-| Swagger API      | http://localhost:8080/swagger |
-| API Health Check | http://localhost:8080/health  |
-| MongoDB          | mongodb://localhost:27017     |
+| Swagger API      | http://localhost:8082/swagger |
+| API Health Check | http://localhost:8082/health  |
+| MongoDB          | mongodb://localhost:27018     |
 
 Sau khi build lại frontend, nên nhấn:
 
@@ -217,11 +217,11 @@ Ctrl + F5
 
 ## 9. Tài khoản demo
 
-| Vai trò       | Email                                | Mật khẩu     |
-| ------------- | ------------------------------------ | ------------ |
-| Quản trị viên | `admin@lms.edu.vn`                   | `Lms@123456` |
-| Giảng viên    | `gv001@lms.edu.vn`                   | `Lms@123456` |
-| Sinh viên     | `2001230381` hoặc `sv001@lms.edu.vn` | `Lms@123456` |
+| Vai trò       | Email / Tên đăng nhập               | Mật khẩu     |
+| ------------- | ----------------------------------- | ------------ |
+| Quản trị viên | `admin@lms.edu.vn`                  | `Lms@123456` |
+| Giảng viên    | `gv001@lms.edu.vn`                  | `Lms@123456` |
+| Sinh viên     | `2001230381` (Nguyễn Vĩnh Khang)    | `Lms@123456` |
 
 Các tài khoản này chỉ dùng cho môi trường development và dữ liệu seed.
 
@@ -373,7 +373,7 @@ Chạy aggregation mẫu:
 
 ```powershell
 mongosh `
-  "mongodb://localhost:27017/EduManageLms" `
+  "mongodb://localhost:27018/EduManageLms" `
   database/04-aggregation-pipelines.js
 ```
 
@@ -381,7 +381,7 @@ Chạy explain:
 
 ```powershell
 mongosh `
-  "mongodb://localhost:27017/EduManageLms" `
+  "mongodb://localhost:27018/EduManageLms" `
   database/05-explain.js
 ```
 
@@ -487,9 +487,9 @@ Sau đó nhấn `Ctrl + F5`.
 Kiểm tra:
 
 ```powershell
-netstat -ano | findstr :8080
+netstat -ano | findstr :8082
 netstat -ano | findstr :8081
-netstat -ano | findstr :27017
+netstat -ano | findstr :27018
 ```
 
 ---

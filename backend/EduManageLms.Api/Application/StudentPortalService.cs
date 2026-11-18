@@ -149,7 +149,7 @@ public sealed class StudentPortalService(MongoContext db, IStudentAnalyticsServi
             }).ToList();
 
         var completedCredits = latestRecords.Values
-            .Where(x => IsPublished(x.ScoreStatus) && !x.ExcludeFromGpa && CalculateFinalScore(x) >= 4)
+            .Where(x => IsPublished(x.ScoreStatus) && CalculateFinalScore(x) >= 4)
             .GroupBy(x => x.CourseCode)
             .Sum(x => x.First().Credits);
         return new StudentCurriculumDto(

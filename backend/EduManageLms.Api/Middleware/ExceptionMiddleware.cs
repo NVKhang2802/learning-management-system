@@ -19,7 +19,13 @@ public sealed class ExceptionMiddleware(
         {
             var (status, message) = MapException(exception);
             if (status >= StatusCodes.Status500InternalServerError)
-                log.LogError(exception, "Unhandled exception");
+            {
+                log.LogError(exception, "Server Error [{StatusCode}]: {Message}", status, message);
+            }
+            else
+            {
+                log.LogWarning("Client Warning [{StatusCode}]: {Message}", status, message);
+            }
 
             context.Response.StatusCode = status;
             context.Response.ContentType = "application/json";
@@ -42,6 +48,15 @@ public sealed class ExceptionMiddleware(
     {
         if (exception is AppException appException)
             return (appException.StatusCode, appException.Message);
+
+        if (exception is ArgumentException or ArgumentNullException or FormatException)
+            return (StatusCodes.Status400BadRequest, exception.Message);
+
+        if (exception is KeyNotFoundException)
+            return (StatusCodes.Status404NotFound, exception.Message);
+
+        if (exception is UnauthorizedAccessException)
+            return (StatusCodes.Status403Forbidden, "Không có quyền truy cập.");
 
         if (exception is MongoWriteException validationWrite
                 && validationWrite.WriteError.Code == 121

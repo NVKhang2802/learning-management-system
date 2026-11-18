@@ -12,6 +12,7 @@ export type AdminFieldType =
 export interface AdminFieldOption {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 export interface AdminFieldDefinition {
@@ -180,7 +181,7 @@ export const ADMIN_RESOURCE_FIELDS: Record<string, AdminFieldDefinition[]> = {
       options: [
         { value: 'Draft', label: 'Bản nháp' },
         { value: 'Submitted', label: 'Chờ duyệt' },
-        { value: 'Published', label: 'Đã công bố' },
+        { value: 'Published', label: 'Đã công bố (chỉ duyệt ở Duyệt bảng điểm)', disabled: true },
         { value: 'Locked', label: 'Đã khóa' },
         { value: 'Reopened', label: 'Đã mở lại' }
       ]

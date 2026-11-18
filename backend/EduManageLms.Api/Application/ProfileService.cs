@@ -37,6 +37,11 @@ public sealed class ProfileService(MongoContext db) : IProfileService
                 StringComparer.OrdinalIgnoreCase))
             throw new AppException("Giới tính không hợp lệ.");
 
+        var phone = request.Phone?.Trim();
+        if (!string.IsNullOrWhiteSpace(phone)
+            && !System.Text.RegularExpressions.Regex.IsMatch(phone, @"^(0|\+84)[0-9]{9,10}$"))
+            throw new AppException("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ (10 chữ số, bắt đầu bằng 0 hoặc +84).");
+
         using var session = await db.Client.StartSessionAsync(
             cancellationToken: ct);
         await session.WithTransactionAsync(
