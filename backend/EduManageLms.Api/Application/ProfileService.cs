@@ -37,7 +37,7 @@ public sealed class ProfileService(MongoContext db) : IProfileService
                 StringComparer.OrdinalIgnoreCase))
             throw new AppException("Giới tính không hợp lệ.");
 
-        var phone = request.Phone?.Trim();
+        var phone = request.Phone?.Trim().Replace(" ", "");
         if (!string.IsNullOrWhiteSpace(phone)
             && !System.Text.RegularExpressions.Regex.IsMatch(phone, @"^(0|\+84)[0-9]{9,10}$"))
             throw new AppException("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ (10 chữ số, bắt đầu bằng 0 hoặc +84).");
@@ -59,7 +59,7 @@ public sealed class ProfileService(MongoContext db) : IProfileService
                     && !string.IsNullOrWhiteSpace(user.StudentCode))
                 {
                     var update = Builders<Student>.Update
-                        .Set(x => x.Phone, request.Phone?.Trim() ?? string.Empty)
+                        .Set(x => x.Phone, phone ?? string.Empty)
                         .Set(x => x.Address, request.Address?.Trim() ?? string.Empty)
                         .Set(x => x.DateOfBirth, request.DateOfBirth)
                         .Set(x => x.UpdatedAt, DateTime.UtcNow);
@@ -84,7 +84,7 @@ public sealed class ProfileService(MongoContext db) : IProfileService
                         Builders<Lecturer>.Update
                             .Set(
                                 x => x.Phone,
-                                request.Phone?.Trim() ?? string.Empty)
+                                phone ?? string.Empty)
                             .Set(x => x.UpdatedAt, DateTime.UtcNow),
                         cancellationToken: token);
                     if (result.MatchedCount == 0)

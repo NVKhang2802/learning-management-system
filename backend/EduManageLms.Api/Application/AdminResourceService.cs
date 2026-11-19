@@ -142,14 +142,6 @@ public sealed class AdminResourceService(MongoContext db) : IAdminResourceServic
         NormalizeRolePermissions(resource, prepared);
         ValidateResourceBody(resource, prepared, updating: false);
         ValidateSpecializedFields(resource, prepared);
-        if (resource.Equals("class-sections", StringComparison.OrdinalIgnoreCase))
-        {
-            var targetGradeStatus = GetString(prepared, "gradeStatus") ?? GetString(prepared, "status");
-            if (string.Equals(targetGradeStatus, "Published", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new AppException("Lớp học phần mới tạo không thể ở trạng thái 'Đã công bố'.");
-            }
-        }
         await EnsureUniqueAsync(resource, prepared, currentId: null, ct);
 
         return prepared;
@@ -175,21 +167,15 @@ public sealed class AdminResourceService(MongoContext db) : IAdminResourceServic
         NormalizeRolePermissions(resource, body, existing);
         ValidateResourceBody(resource, body, updating: true);
         ValidateSpecializedFields(resource, body);
+        await EnsureUniqueAsync(resource, body, id, ct);
+
         if (resource.Equals("class-sections", StringComparison.OrdinalIgnoreCase))
         {
-            var targetGradeStatus = GetString(body, "gradeStatus") ?? GetString(body, "status");
-            if (string.Equals(targetGradeStatus, "Published", StringComparison.OrdinalIgnoreCase))
-            {
-                var currentStatus = existing.Contains("gradeStatus")
-                    ? existing["gradeStatus"].AsString
-                    : existing.Contains("status") ? existing["status"].AsString : "";
-                if (!string.Equals(currentStatus, "Published", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new AppException("Không thể chuyển trạng thái sang 'Đã công bố' trực tiếp tại đây. Vui lòng thực hiện quy trình phê duyệt điểm tại màn hình 'Duyệt bảng điểm' để đảm bảo tính toàn vẹn dữ liệu điểm số và lịch sử học tập.");
-                }
-            }
+            body.Remove("gradeStatus");
+            body.Remove("status");
+            body.Remove("students");
+            body.Remove("gradingSchemeSnapshot");
         }
-        await EnsureUniqueAsync(resource, body, id, ct);
 
         var fieldsToUnset = body
             .Where(pair => IsClearValue(pair.Value))
@@ -1334,12 +1320,13 @@ public sealed class AdminResourceService(MongoContext db) : IAdminResourceServic
 
         if (body.TryGetValue("phone", out var rawPhone) && rawPhone is not null)
         {
-            var phone = rawPhone.ToString()?.Trim();
+            var phone = rawPhone.ToString()?.Trim().Replace(" ", "");
             if (!string.IsNullOrWhiteSpace(phone)
                 && !System.Text.RegularExpressions.Regex.IsMatch(phone, @"^(0|\+84)[0-9]{9,10}$"))
             {
                 throw new AppException("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ (10 chữ số, bắt đầu bằng 0 hoặc +84).");
             }
+            body["phone"] = phone;
         }
 
         var status = GetString(body, "status");

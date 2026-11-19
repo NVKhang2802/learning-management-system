@@ -115,7 +115,7 @@ Cần cài thêm:
 
 ```powershell
 git clone https://github.com/NVKhang2802/learning-management-system.git
-cd nosql
+cd learning-management-system
 ```
 
 Kiểm tra nhánh:

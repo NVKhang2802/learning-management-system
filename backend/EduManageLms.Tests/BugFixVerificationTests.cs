@@ -15,6 +15,8 @@ public sealed class BugFixVerificationTests
     [InlineData("0987654321", true)]
     [InlineData("+84912345678", true)]
     [InlineData("0834567890", true)]
+    [InlineData("0912 345 678", true)]
+    [InlineData("+84 912 345 678", true)]
     [InlineData("abc", false)]
     [InlineData("12345", false)]
     [InlineData("phone123", false)]
@@ -22,7 +24,8 @@ public sealed class BugFixVerificationTests
     [InlineData("", false)]
     public void PhoneNumberRegex_ValidatesVietnamesePhoneNumbers(string phone, bool isValid)
     {
-        PhoneRegex.IsMatch(phone).Should().Be(isValid);
+        var normalized = phone.Trim().Replace(" ", "");
+        PhoneRegex.IsMatch(normalized).Should().Be(isValid);
     }
 
     [Fact]

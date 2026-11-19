@@ -123,7 +123,8 @@ public sealed class StudentPortalService(MongoContext db, IStudentAnalyticsServi
                 {
                     latestRecords.TryGetValue(item.CourseCode, out var record);
                     var finalScore = record is not null && IsPublished(record.ScoreStatus) ? CalculateFinalScore(record) : (double?)null;
-                    var status = record is null ? "NotRegistered" : IsPublished(record.ScoreStatus) ? (finalScore >= 4 ? "Passed" : "Failed") : "InProgress";
+                    var isPassed = record is not null && IsPublished(record.ScoreStatus) && IsCoursePassed(record);
+                    var status = record is null ? "NotRegistered" : IsPublished(record.ScoreStatus) ? (isPassed ? "Passed" : "Failed") : "InProgress";
                     return new CurriculumCourseDto(
                         ++order,
                         item.CourseCode,
@@ -149,7 +150,7 @@ public sealed class StudentPortalService(MongoContext db, IStudentAnalyticsServi
             }).ToList();
 
         var completedCredits = latestRecords.Values
-            .Where(x => IsPublished(x.ScoreStatus) && CalculateFinalScore(x) >= 4)
+            .Where(x => IsPublished(x.ScoreStatus) && IsCoursePassed(x))
             .GroupBy(x => x.CourseCode)
             .Sum(x => x.First().Credits);
         return new StudentCurriculumDto(
@@ -345,6 +346,17 @@ public sealed class StudentPortalService(MongoContext db, IStudentAnalyticsServi
                 ? 0
                 : score.Score.Value / score.MaxScore * 10 * score.Weight / 100);
         return Math.Round(value, 2, MidpointRounding.AwayFromZero);
+    }
+
+    private static bool IsCoursePassed(StudentCourseRecord course, double passingScore = 4.0)
+    {
+        if (CalculateFinalScore(course) < passingScore)
+            return false;
+
+        return !course.Scores.Any(score =>
+            score.IsRequired
+            && score.MinimumScore.HasValue
+            && (!score.Score.HasValue || score.Score.Value < score.MinimumScore.Value));
     }
 
     private static string BuildSemesterKey(string academicYear, string semesterCode, string semesterName) =>

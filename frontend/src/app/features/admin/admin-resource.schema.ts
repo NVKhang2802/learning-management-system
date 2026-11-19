@@ -173,19 +173,7 @@ export const ADMIN_RESOURCE_FIELDS: Record<string, AdminFieldDefinition[]> = {
     { key: 'semesterId', label: 'Học kỳ', type: 'select', source: 'semesters', optionLabel: 'semesterName', required: true },
     { key: 'capacity', label: 'Sĩ số tối đa', type: 'number' },
     { key: 'startDate', label: 'Ngày bắt đầu', type: 'date' },
-    { key: 'endDate', label: 'Ngày kết thúc', type: 'date' },
-    {
-      key: 'gradeStatus',
-      label: 'Trạng thái bảng điểm',
-      type: 'select',
-      options: [
-        { value: 'Draft', label: 'Bản nháp' },
-        { value: 'Submitted', label: 'Chờ duyệt' },
-        { value: 'Published', label: 'Đã công bố (chỉ duyệt ở Duyệt bảng điểm)', disabled: true },
-        { value: 'Locked', label: 'Đã khóa' },
-        { value: 'Reopened', label: 'Đã mở lại' }
-      ]
-    }
+    { key: 'endDate', label: 'Ngày kết thúc', type: 'date' }
   ],
   'system-settings': [
     {

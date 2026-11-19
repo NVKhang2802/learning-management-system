@@ -19,6 +19,7 @@ patch-backup-*/
 .angular/
 .vs/
 docs/
+BAO_CAO_TEST_LAN_2.md
 
 # Local patch backups and reports
 patch-backup-*/

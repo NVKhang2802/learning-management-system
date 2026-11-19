@@ -93,13 +93,13 @@ builder.Services.AddRateLimiter(options => options.AddFixedWindowLimiter("login"
 }));
 
 var app = builder.Build();
+app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseSerilogRequestLogging();
 app.UseCors("frontend");
 app.UseRateLimiter();
 app.UseAuthentication();
